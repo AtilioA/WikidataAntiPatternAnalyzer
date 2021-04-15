@@ -6,15 +6,17 @@ const headers = {
 
 const fetch = require('node-fetch');
 
+let buildQueryString = (queryEntity) => QUERY_TEMPLATE.replace(/Q150/gi, queryEntity)
+
 let getRequestEndpoint = async () => {
     try {
-        console.log(`\n REQUESTING ${BASE_URL + encodeURIComponent(QUERY_TEMPLATE)}...\n`)
+        console.log(`REQUESTING ${BASE_URL + encodeURIComponent(QUERY_TEMPLATE)}...\n`)
         let request = await fetch(BASE_URL + encodeURIComponent(QUERY_TEMPLATE), { headers })
 
         if (request) {
-            console.log(`\n REQUESTED. READING...\n`)
+            console.log(`REQUESTED. READING...\n`)
             let response = await request.json();
-            console.log(`\nRESPONSE:`)
+            console.log(`RESPONSE:`)
             console.log(response['results']['bindings'])
             return response;
         }
@@ -24,4 +26,5 @@ let getRequestEndpoint = async () => {
     }
 }
 
-getRequestEndpoint()
+console.log(buildQueryString("Q2"))
+getRequestEndpoint();
