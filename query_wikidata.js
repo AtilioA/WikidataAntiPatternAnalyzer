@@ -26,5 +26,24 @@ let getRequestEndpoint = async () => {
     }
 }
 
-console.log(buildQueryString("Q2"))
-getRequestEndpoint();
+let parseResultValue = (result) => {
+   return result['object']['value'].match(/Q\w+/)[0];
+}
+
+let checkForAntipattern = async (entity, statement) => {
+    // console.log(statement);
+    const { newEntity, newProperty } = statement;
+
+    const queryString = buildQueryString(entity, "P31");
+    console.log(queryString);
+
+    const response = await getRequestEndpoint(queryString);
+    console.log(response);
+    const results = response['results']['bindings'];
+
+    let QIDs = results.map(parseResultValue);
+    console.log(`${entity} is involved in AP1 with ${QIDs.length} entities.`)
+
+}
+
+checkForAntipattern("Q24609026", { newEntity: "Q34770", newProperty: "P279" });
