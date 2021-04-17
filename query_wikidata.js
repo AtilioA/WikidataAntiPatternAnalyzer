@@ -1,23 +1,28 @@
 const BASE_URL = "https://query.wikidata.org/sparql?query="
-const QUERY_TEMPLATE = `SELECT * WHERE { wd:Q150 wdt:P31 ?object . wd:Q150 wdt:P279+ ?object . }`
+const QUERY_TEMPLATE = `SELECT * WHERE { wd:Q31 wdt:P31 ?object . wd:Q279 wdt:P279+ ?object . }`
 const headers = {
     Accept: "application/sparql-results+json"
 }
 
 const fetch = require('node-fetch');
 
-let buildQueryString = (queryEntity) => QUERY_TEMPLATE.replace(/Q150/gi, queryEntity)
+let buildQueryString = (queryEntity, replaceProperty) => {
+    if (replaceProperty) {
+        return QUERY_TEMPLATE.replace(new RegExp(`Q${replaceProperty.slice(1)}`), queryEntity)
+    } else {
+        return QUERY_TEMPLATE.replace(/Q\w+/gi, queryEntity)
+    }
+}
 
-let getRequestEndpoint = async () => {
+let getRequestEndpoint = async (queryString) => {
     try {
-        console.log(`REQUESTING ${BASE_URL + encodeURIComponent(QUERY_TEMPLATE)}...\n`)
-        let request = await fetch(BASE_URL + encodeURIComponent(QUERY_TEMPLATE), { headers })
+        console.log(`REQUESTING ${BASE_URL + encodeURIComponent(queryString)}...\n`)
+        let request = await fetch(BASE_URL + encodeURIComponent(queryString), { headers })
 
         if (request) {
-            console.log(`REQUESTED. READING...\n`)
+            // console.log(`REQUESTED. READING...\n`)
             let response = await request.json();
-            console.log(`RESPONSE:`)
-            console.log(response['results']['bindings'])
+            // console.log(`RESPONSE:`)
             return response;
         }
     }
