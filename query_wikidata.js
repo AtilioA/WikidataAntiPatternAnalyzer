@@ -49,6 +49,29 @@ let checkForAntipattern = async (entity, statement) => {
     let QIDs = results.map(parseResultValue);
     console.log(`${entity} is involved in AP1 with ${QIDs.length} entities.`)
 
+    // let antipatterns = {
+    //     existent: QIDs,
+    //     new: false
+    // }
+
+    // console.log(results);
+    if (QIDs.length == 0) {
+        if (!introducesAntipattern) {
+            // CASE 1: Entity isn't involved in AP1 and new statement does not introduce violations
+        } else {
+            // CASE 2: Entity isn't involved in AP1 and new statement introduces violations
+        }
+    }
+    else
+    {
+        if (!introducesAntipattern) {
+            // CASE 3: Entity is already involved in AP1 and new statement does not introduce violations
+        } else {
+            // CASE 4: Entity is already involved in AP1 and new statement introduces violations
+        }
+    }
+
+    return antipatterns;
 }
 
 checkForAntipattern("Q24609026", { newEntity: "Q34770", newProperty: "P279" });
