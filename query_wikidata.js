@@ -83,6 +83,40 @@ async function isInstance(instance, entity) {
     }
 }
 
+async function isInstanceBulk(instance, entities) {
+    let P31_QUERY = "SELECT * WHERE {\n"
+
+    let nEntities = 0;
+    for (let entity of entities) {
+        P31_QUERY += `BIND( EXISTS { wd:${instance} wdt:P31 wd:${entity} } as ?isInstance${nEntities} ) .\n`
+        nEntities++;
+    }
+    P31_QUERY += "}"
+
+    console.log(P31_QUERY);
+
+    try {
+        let request = await fetch(BASE_URL + encodeURIComponent(P31_QUERY), { headers })
+
+        if (request) {
+            let response = await request.json();
+            const results = Object.values(response['results']['bindings'][0]);
+
+            nEntities = 0;
+            let areInstances = {true: [], false: []};
+            for (let result of results) {
+                areInstances[result['value']].push(entities[nEntities]);
+                nEntities++;
+            }
+
+            return areInstances;
+        }
+    }
+    catch(error) {
+        throw new Error(error.message);
+    }
+}
+
 async function querySuperclasses(entity) {
 
 }
@@ -122,27 +156,17 @@ async function checkForAntipattern(entity, statement) {
         const superclassesQuery = await queryP279(newEntity, '?object'); // get all newEntity's superclasses
         const superclasses = superclassesQuery['results']['bindings'].map(parseResultValues);
         superclasses.push(newEntity);
+        // console.log("Superclasses: ", superclasses);
 
-        console.log("Superclasses: ", superclasses.slice(4));
-        for (let superclass of superclasses.slice(4)) {
-            const isEntityInstance = await !isInstance(entity, superclass);
-            if (isEntityInstance) {
-                // console.log(`${entity} is instance of ${superclass}.`)
-                QIDsNew.push(superclass);
-            }
-        }
-
-        // QIDsNew = await superclasses.map(await async function(superclass) { return isInstance(entity, superclass) });
-        // const QIDsExistent = isInstance(entity, newEntity)); // is entity P31 newEntity or its superclasses also true?
-        // if (QIDsExistent.length) { // is entity P279 newEntity also true?
-        //     QIDsNew = true; // then it is a violation
-        // }
+        let areInstances = await isInstanceBulk(entity, superclasses); // is entity P31 newEntity or its superclasses also true?
+        QIDsNew = areInstances['true'];
     }
 
     let antipatterns = {
         existent: QIDsExistent,
         new: QIDsNew
     }
+
     console.log(antipatterns);
 
     // // Interpret results
@@ -175,6 +199,8 @@ async function test() {
     await checkForAntipattern("Q185667", { newEntity: "Q618779", newProperty: "P279" });
     console.log("CASE 1: Entity isn't involved in AP1 and new statement does not introduce violations (P31)")
     await checkForAntipattern("Q185667", { newEntity: "Q618779", newProperty: "P31" });
+    return;
+
     // CASE 2
     console.log("CASE 2: Entity isn't involved in AP1 and new statement introduces violations (P279)")
     await checkForAntipattern("Q185667", { newEntity: "Q618779", newProperty: "P31" });
