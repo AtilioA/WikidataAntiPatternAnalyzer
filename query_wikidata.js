@@ -94,7 +94,7 @@ let parseResultValues = (result) => {
 }
 
 async function checkForAntipattern(entity, statement) {
-    console.log(statement);
+    // console.log(statement);
     const { newEntity, newProperty } = statement;
 
     // Test for existing AP1
@@ -127,7 +127,7 @@ async function checkForAntipattern(entity, statement) {
         for (let superclass of superclasses.slice(4)) {
             const isEntityInstance = await !isInstance(entity, superclass);
             if (isEntityInstance) {
-                console.log(`${entity} is instance of ${superclass}.`)
+                // console.log(`${entity} is instance of ${superclass}.`)
                 QIDsNew.push(superclass);
             }
         }
@@ -169,5 +169,29 @@ async function checkForAntipattern(entity, statement) {
     return antipatterns;
 }
 
-checkForAntipattern("Q150", { newEntity: "Q85380120", newProperty: "P279" });
-// checkForAntipattern("Q150");
+async function test() {
+    // CASE 1
+    console.log("CASE 1: Entity isn't involved in AP1 and new statement does not introduce violations (P279)")
+    await checkForAntipattern("Q185667", { newEntity: "Q618779", newProperty: "P279" });
+    console.log("CASE 1: Entity isn't involved in AP1 and new statement does not introduce violations (P31)")
+    await checkForAntipattern("Q185667", { newEntity: "Q618779", newProperty: "P31" });
+    // CASE 2
+    console.log("CASE 2: Entity isn't involved in AP1 and new statement introduces violations (P279)")
+    await checkForAntipattern("Q185667", { newEntity: "Q618779", newProperty: "P31" });
+    console.log("CASE 2: Entity isn't involved in AP1 and new statement introduces violations (P31)")
+    await checkForAntipattern("Q21198", { newEntity: "Q5422299", newProperty: "P279" });
+
+    // CASE 3
+    console.log("CASE 3: Entity is already involved in AP1 and new statement does not introduce violations (P279)")
+    await checkForAntipattern("Q150", { newEntity: "Q85380120", newProperty: "P279" });
+    console.log("CASE 3: Entity is already involved in AP1 and new statement does not introduce violations (P31)")
+    await checkForAntipattern("Q150", { newEntity: "Q85380120", newProperty: "P31" });
+
+    // CASE 4
+    console.log("CASE 4: Entity is already involved in AP1 and new statement introduces violations (P279)")
+    await checkForAntipattern("Q46525", { newEntity: "Q11448906", newProperty: "P279" });
+    console.log("CASE 4: Entity is already involved in AP1 and new statement introduces violations (P31)")
+    await checkForAntipattern("Q46525", { newEntity: "Q476300", newProperty: "P31" });
+}
+
+test()
