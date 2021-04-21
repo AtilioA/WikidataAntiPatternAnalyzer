@@ -48,10 +48,20 @@ div#radio-input label {
     padding-right: 10px;
 }
 
+.textInputDivDefault {
+    display: block;
+    padding-top: 10px;
+}
+
+input {
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
 /* Hidden form */
 .textInputDiv{
 	display: none;
-    padding: 10px;
+    padding-bottom: 10px;
 }
 
 button {

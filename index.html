@@ -11,31 +11,30 @@
 
 <body>
     <div class="banner">
-        <img src="static/assets/images/wikidata_logo.png" alt="Wikidata Logo">
+        <a href="./index.html">
+            <img src="static/assets/images/wikidata_logo.png" alt="Wikidata Logo">
+        </a>
     </div>
     <div id="title">
         <h1>Wikidata Anti-pattern Analyzer</h1>
     </div>
-    <form action="/"></form>
+    <form action="/results.html"></form>
         <div id="prompt">
             <h2>I want to analyze...</h2>
 
             <div id="radio-input">
-                <input type="radio" id="existent-antipattern" name="analysis-option" value="existent">
+                <input type="radio" id="existent-antipattern" name="analysis-option" value="existent" checked>
                 <label for="existent-antipattern">an entity</label>
 
                 <input type="radio" id="new-antipattern" name="analysis-option" value="new">
                 <label for="new-antipattern">a new statement</label><br>
             </div>
 
-            <div id="show-existent" class="textInputDiv">
+            <div id="existent" class="textInputDivDefault">
                 <header>Entity</header>
                 <input type="text" id="inputEntity" name="inputEntity" placeholder="Q42">
             </div>
             <div id="show-new" class="textInputDiv">
-                <header>Entity</header>
-                <input type="text" id="inputEntity" name="inputEntity" placeholder="Q42">
-
                 <header>New property</header>
                 <input type="text" id="inputNewProperty" name="inputNewProperty" placeholder="P31">
 
