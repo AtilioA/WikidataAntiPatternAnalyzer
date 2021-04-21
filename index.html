@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wikidata Anti-pattern Analyzer</title>
+
+    <link rel="stylesheet" type="text/css" href="static/assets/css/style.css"/>
+</head>
+
+<body>
+    <div class="banner">
+        <img src="static/assets/images/wikidata_logo.png" alt="Wikidata Logo">
+    </div>
+    <div id="title">
+        <h1>Wikidata Anti-pattern Analyzer</h1>
+    </div>
+    <form action="/"></form>
+        <div id="prompt">
+            <h2>I want to analyze...</h2>
+
+            <div id="radio-input">
+                <input type="radio" id="existent-antipattern" name="analysis-option" value="existent">
+                <label for="existent-antipattern">an entity</label>
+
+                <input type="radio" id="new-antipattern" name="analysis-option" value="new">
+                <label for="new-antipattern">a new statement</label><br>
+            </div>
+
+            <div id="show-existent" class="textInputDiv">
+                <header>Entity</header>
+                <input type="text" id="inputEntity" name="inputEntity" placeholder="Q42">
+            </div>
+            <div id="show-new" class="textInputDiv">
+                <header>Entity</header>
+                <input type="text" id="inputEntity" name="inputEntity" placeholder="Q42">
+
+                <header>New property</header>
+                <input type="text" id="inputNewProperty" name="inputNewProperty" placeholder="P31">
+
+                <header>New entity</header>
+                <input type="text" id="inputNewEntity" name="inputNewEntity" placeholder="Q43">
+            </div>
+        </div>
+    </form>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery"></script>
+<script type="text/javascript" src="static/assets/js/script.js"></script>
+<!-- <script type="text/javascript" src="static/assets/jsquery_wikidata.js"></script> -->
+
+</html>
