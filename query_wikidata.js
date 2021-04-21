@@ -93,7 +93,7 @@ async function isInstanceBulk(instance, entities) {
     }
     P31_QUERY += "}"
 
-    console.log(P31_QUERY);
+    // console.log(P31_QUERY);
 
     try {
         let request = await fetch(BASE_URL + encodeURIComponent(P31_QUERY), { headers })
@@ -115,10 +115,6 @@ async function isInstanceBulk(instance, entities) {
     catch(error) {
         throw new Error(error.message);
     }
-}
-
-async function querySuperclasses(entity) {
-
 }
 
 let parseResultValues = (result) => {
@@ -144,11 +140,11 @@ async function checkForAntipattern(entity, statement) {
 
     // Test for new statement
     let QIDsNew = [];
-    console.log("\n\nChecking new antipattern")
+    console.log("\nChecking possible new antipattern")
     if (newProperty == "P31") { // "entity is instance of newEntity" is true
-        queryResponse = await isSubclass(entity, 'wd:' + newEntity);
-        queryResult = queryResponse['results']['bindings'][0]["isSubclass"]['value'];
-        if (queryResult) { // is "entity is subclass of newEntity" also true?
+        queryResult = await isSubclass(entity, 'wd:' + newEntity);
+        console.log(queryResult, newEntity);
+        if (queryResult == "true") { // is "entity is subclass of newEntity" also true?
             QIDsNew = newEntity; // then it is a violation
         }
     }
@@ -169,27 +165,6 @@ async function checkForAntipattern(entity, statement) {
 
     console.log(antipatterns);
 
-    // // Interpret results
-    // if (antipatterns.existent.length) {
-    //     if (!antipatterns.new) {
-    //         // CASE 1: Entity isn't involved in AP1 and new statement does not introduce violations
-    //         return antipatterns;
-    //     } else {
-    //         // CASE 2: Entity isn't involved in AP1 and new statement introduces violations
-
-    //     }
-    // }
-    // else
-    // {
-    //     if (!antipatterns.new) {
-    //         // CASE 3: Entity is already involved in AP1 and new statement does not introduce violations
-
-    //     } else {
-    //         // CASE 4: Entity is already involved in AP1 and new statement introduces violations
-
-    //     }
-    // }
-
     return antipatterns;
 }
 
@@ -197,21 +172,20 @@ async function test() {
     // CASE 1
     console.log("CASE 1: Entity isn't involved in AP1 and new statement does not introduce violations (P279)")
     await checkForAntipattern("Q185667", { newEntity: "Q618779", newProperty: "P279" });
-    console.log("CASE 1: Entity isn't involved in AP1 and new statement does not introduce violations (P31)")
+    console.log("\nCASE 1: Entity isn't involved in AP1 and new statement does not introduce violations (P31)")
     await checkForAntipattern("Q185667", { newEntity: "Q618779", newProperty: "P31" });
-    return;
 
     // CASE 2
     console.log("CASE 2: Entity isn't involved in AP1 and new statement introduces violations (P279)")
-    await checkForAntipattern("Q185667", { newEntity: "Q618779", newProperty: "P31" });
+    await checkForAntipattern("Q185667", { newEntity: "Q636581", newProperty: "P279" });
     console.log("CASE 2: Entity isn't involved in AP1 and new statement introduces violations (P31)")
-    await checkForAntipattern("Q21198", { newEntity: "Q5422299", newProperty: "P279" });
+    await checkForAntipattern("Q23714147", { newEntity: "Q11448906", newProperty: "P31" });
 
     // CASE 3
     console.log("CASE 3: Entity is already involved in AP1 and new statement does not introduce violations (P279)")
-    await checkForAntipattern("Q150", { newEntity: "Q85380120", newProperty: "P279" });
+    await checkForAntipattern("Q150", { newEntity: "Q20829075", newProperty: "P279" });
     console.log("CASE 3: Entity is already involved in AP1 and new statement does not introduce violations (P31)")
-    await checkForAntipattern("Q150", { newEntity: "Q85380120", newProperty: "P31" });
+    await checkForAntipattern("Q150", { newEntity: "Q397", newProperty: "P31" });
 
     // CASE 4
     console.log("CASE 4: Entity is already involved in AP1 and new statement introduces violations (P279)")
@@ -220,4 +194,4 @@ async function test() {
     await checkForAntipattern("Q46525", { newEntity: "Q476300", newProperty: "P31" });
 }
 
-test()
+// test()
