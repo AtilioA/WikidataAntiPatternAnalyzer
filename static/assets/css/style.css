@@ -61,3 +61,14 @@ div#radio-input label {
 
 /* .banner {
 } */
+
+div#footer {
+    position: absolute;
+    bottom: 0;
+}
+
+div#footer a {
+    font-family: "Red Hat Text";
+    color: #0744AD;
+    text-decoration: none;
+}
