@@ -66,23 +66,6 @@ async function isSubclass(subclass, superclass) {
     }
 }
 
-async function isInstance(instance, entity) {
-    const P31_QUERY = `SELECT * WHERE { BIND( EXISTS { wd:${instance} wdt:P31 wd:${entity} } as ?isInstance ) }`
-
-    try {
-        let request = await fetch(BASE_URL + encodeURIComponent(P31_QUERY), { headers })
-
-        if (request) {
-            let response = await request.json();
-            // console.log(response['results']['bindings'][0]["isInstance"]['value']);
-            return response['results']['bindings'][0]["isInstance"]['value'];
-        }
-    }
-    catch(error) {
-        throw new Error(error.message);
-    }
-}
-
 async function isInstanceBulk(instance, entities) {
     let P31_QUERY = "SELECT * WHERE {\n"
 
