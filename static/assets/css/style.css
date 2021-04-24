@@ -3,6 +3,16 @@
     src: url('../fonts/Adamina-Regular.ttf');
 }
 
+div#title {
+    font-size: 24px;
+    margin-top: -30px;
+    margin-bottom: 10px;
+}
+
+div#title h1 {
+    font-weight: normal;
+}
+
 @font-face {
     font-family: 'Red Hat Text';
     src: url('../fonts/RedHatText-Regular.ttf');
@@ -27,6 +37,7 @@ h1 {
 }
 
 div#prompt {
+    font-size: 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -36,8 +47,12 @@ div#prompt {
 
 div#radio-input {
     display: flex;
-    flex-direction: row;
-    padding-right: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+div#radio-input input {
+    margin: 0 5px 0 0;
 }
 
 div#radio-input input {
