@@ -205,7 +205,7 @@ async function handleParams() {
 
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "success")
-            resultItem.innerHTML = `<u>${inputEntity}</u><b>would not be involved</b> in AP1 regarding the new statement.`
+            resultItem.innerHTML = `<u>${inputEntity}</u> <b>would not be involved</b> in AP1 regarding the new statement.`
 
             results.appendChild(resultItem);
         }
