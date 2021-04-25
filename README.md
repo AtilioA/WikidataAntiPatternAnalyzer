@@ -1,6 +1,6 @@
 
 <h1 align="center">
-  	<a href="https://atilioa.github.io/WikidataAntipatternAnalyzer.com/">
+  	<a href="https://atilioa.github.io/WikidataAntipatternAnalyzer/">
 		<img src=".github/wikidata_antipattern_analyzer_logo.png" width=50%">
 		<br/>
 	 	Wikidata Anti-pattern Analyzer
