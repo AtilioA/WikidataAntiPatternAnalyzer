@@ -18,7 +18,7 @@
     <div id="title">
         <h1>Wikidata Anti-pattern Analyzer</h1>
     </div>
-    <form action="/results.html"></form>
+    <form action="results.html" method="GET">
         <div id="prompt">
             <h2>I want to analyze...</h2>
 
@@ -41,9 +41,9 @@
                 <header>New entity</header>
                 <input type="text" id="inputNewEntity" name="inputNewEntity" placeholder="Q43">
             </div>
+            
+            <button type="submit">Look for violations</button>
         </div>
-
-        <button type="submit">Look for violations</button>
     </form>
 
     <div id="footer">
