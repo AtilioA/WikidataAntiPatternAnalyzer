@@ -110,7 +110,7 @@ div#results {
 }
 
 p.success {
-    color: #22a164;
+    color: #339966;
 }
 
 p.failure {
@@ -119,7 +119,7 @@ p.failure {
 
 p.success b {
     padding: 5px;
-    background-color: #22a164;
+    background-color: #339966;
     color: #fff;
     /* border-radius: 2px; */
 }
@@ -158,6 +158,6 @@ div#footer {
 
 div#footer a {
     font-family: "Red Hat Text";
-    color: #0744AD;
+    color: #006699;
     text-decoration: none;
 }
