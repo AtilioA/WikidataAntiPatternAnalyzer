@@ -142,6 +142,11 @@ div#comment {
     justify-content: center;
 }
 
+div#comment a {
+    text-decoration: none;
+    color: inherit;
+}
+
 div#comment p {
     margin: 20px 0 0 0;
 }
