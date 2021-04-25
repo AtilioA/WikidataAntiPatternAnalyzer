@@ -4,7 +4,6 @@ const headers = {
     Accept: "application/sparql-results+json"
 }
 
-const fetch = require('node-fetch');
 
 let buildQueryString = (queryEntity, queryString, replaceProperty) => {
     // console.log(replaceProperty)
@@ -108,7 +107,13 @@ let parseResultValues = (result) => {
 
 async function checkForAntipattern(entity, statement) {
     // console.log(statement);
-    const { newEntity, newProperty } = statement;
+    let newEntity, newProperty;
+    try {
+        newEntity, newProperty = statement;
+    }
+    catch {
+        console.log("New statement not found.")
+    }
 
     // Test for existing AP1
     const queryString = buildQueryString(entity, QUERY_TEMPLATE);
@@ -151,30 +156,77 @@ async function checkForAntipattern(entity, statement) {
     return antipatterns;
 }
 
-async function test() {
-    // CASE 1
-    console.log("CASE 1: Entity isn't involved in AP1 and new statement does not introduce violations (P279)")
-    await checkForAntipattern("Q185667", { newEntity: "Q618779", newProperty: "P279" });
-    console.log("\nCASE 1: Entity isn't involved in AP1 and new statement does not introduce violations (P31)")
-    await checkForAntipattern("Q185667", { newEntity: "Q618779", newProperty: "P31" });
-
-    // CASE 2
-    console.log("CASE 2: Entity isn't involved in AP1 and new statement introduces violations (P279)")
-    await checkForAntipattern("Q185667", { newEntity: "Q636581", newProperty: "P279" });
-    console.log("CASE 2: Entity isn't involved in AP1 and new statement introduces violations (P31)")
-    await checkForAntipattern("Q23714147", { newEntity: "Q11448906", newProperty: "P31" });
-
-    // CASE 3
-    console.log("CASE 3: Entity is already involved in AP1 and new statement does not introduce violations (P279)")
-    await checkForAntipattern("Q150", { newEntity: "Q20829075", newProperty: "P279" });
-    console.log("CASE 3: Entity is already involved in AP1 and new statement does not introduce violations (P31)")
-    await checkForAntipattern("Q150", { newEntity: "Q397", newProperty: "P31" });
-
-    // CASE 4
-    console.log("CASE 4: Entity is already involved in AP1 and new statement introduces violations (P279)")
-    await checkForAntipattern("Q46525", { newEntity: "Q11448906", newProperty: "P279" });
-    console.log("CASE 4: Entity is already involved in AP1 and new statement introduces violations (P31)")
-    await checkForAntipattern("Q46525", { newEntity: "Q476300", newProperty: "P31" });
+function getUrlVars() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        vars[key] = value;
+    });
+    return vars;
 }
 
-// test()
+async function handleParams() {
+    params = getUrlVars();
+    let antipatterns;
+    switch (params['analysis-option']) {
+        case 'existent':
+            antipatterns = await checkForAntipattern(params["inputEntity"]);
+            break;
+        case 'new':
+            const statement = {
+                newEntity: params['inputNewEntity'],
+                newProperty: params['inputNewProperty']
+            };
+            antipatterns = await checkForAntipattern(params["inputEntity"], statement);
+
+            const comment = document.querySelector("#comment");
+
+            let commentTitle = document.createElement('p');
+            commentTitle.innerHTML = "New statement:"
+
+            let newStatementQuery = document.createElement('code');
+            newStatementQuery.innerHTML = `<i>wd:${params['inputEntity']} wdt:${params['inputNewProperty']} wd:${params['inputNewEntity']}</i>`
+
+            comment.appendChild(commentTitle);
+            comment.appendChild(newStatementQuery);
+            break;
+        default:
+            console.log("Unrecognized option")
+    }
+    if (antipatterns) {
+        console.log(`OK: ${antipatterns['existent']};${antipatterns['new']}`)
+        if (antipatterns['existent'].length > 0) {
+            const results = document.querySelector("#results");
+
+            let resultItem = document.createElement('p');
+            resultItem.setAttribute('class', "failure")
+
+            resultItem.innerHTML = `<u>${params['inputEntity']}</u> <b>is involved</b> in AP1 with <u>${antipatterns['existent']}</u>.`
+            results.appendChild(resultItem);
+        } else {
+            const results = document.querySelector("#results");
+
+            let resultItem = document.createElement('p');
+            resultItem.setAttribute('class', "success")
+            resultItem.innerHTML = `<u>${params['inputEntity']}</u> <b>is not involved</b> in AP1.`
+
+            results.appendChild(resultItem);
+        }
+        if (antipatterns['new'].length > 0) {
+            const results = document.querySelector("#results");
+            let resultItem = document.createElement('p');
+            resultItem.setAttribute('class', "failure")
+            resultItem.innerHTML = `<u>${params['inputEntity']}</u> <b>would be involved</b> in AP1 with <u>${antipatterns['new']}</u> regarding the new statement.`
+            results.appendChild(resultItem);
+        } else if (params['analysis-option'] == 'new') {
+            const results = document.querySelector("#results");
+            let resultItem = document.createElement('p');
+            resultItem.setAttribute('class', "success")
+            resultItem.innerHTML = `<u>${params['inputEntity']}</u> <b>would not be involved</b> in AP1 regarding the new statement.`
+            results.appendChild(resultItem);
+        }
+    } else {
+        console.log("Failed to acquire results.")
+    }
+}
+
+handleParams()
