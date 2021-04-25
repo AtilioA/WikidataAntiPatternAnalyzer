@@ -18,21 +18,17 @@
     <div id="title">
         <h1>Wikidata Anti-pattern Analyzer</h1>
     </div>
-    <form action="/index.html"></form>
+    <form action="index.html" method="GET">
         <div id="prompt">
             <h2>Results:</h2>
 
             <div id="results">
-                <p class="success"><u>Q42</u> <b>is not involved</b> in AP1.</p>
-                <p class="failure"><u>Q42</u> <b>would be involved</b> in AP1 with <u>Q43</u>.</p>
             </div>
 
             <div id="comment">
-                <p>New statement:</p>
-                <code><i>wd:Q42 wdt:P279 wd:Q43</i></code>
             </div>
 
-        <button id="start-over" type="submit">Start over</button>
+            <button id="start-over" type="submit">Start over</button>
     </form>
 
     <div id="footer">
@@ -40,8 +36,6 @@
     </div>
 </body>
 
-<script src="https://cdn.jsdelivr.net/npm/jquery"></script>
-<script type="text/javascript" src="static/assets/js/script.js"></script>
-<!-- <script type="text/javascript" src="static/assets/jsquery_wikidata.js"></script> -->
+<script type="text/javascript" src="static/assets/js/query_wikidata.js"></script>
 
 </html>
