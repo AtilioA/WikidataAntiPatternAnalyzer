@@ -167,16 +167,21 @@ function getUrlVars() {
 async function handleParams() {
     params = getUrlVars();
     let antipatterns;
+
+    const inputEntity = params["inputEntity"].toUpperCase();
+    const inputNewProperty = params["inputNewProperty"].toUpperCase();
+    const inputNewEntity = params["inputNewEntity"].toUpperCase();
+
     switch (params['analysis-option']) {
         case 'existent':
-            antipatterns = await checkForAntipattern(params["inputEntity"]);
+            antipatterns = await checkForAntipattern(inputEntity);
             break;
         case 'new':
             const statement = {
-                newEntity: params['inputNewEntity'],
-                newProperty: params['inputNewProperty']
+                newEntity: inputNewEntity,
+                newProperty: inputNewProperty
             };
-            antipatterns = await checkForAntipattern(params["inputEntity"], statement);
+            antipatterns = await checkForAntipattern(inputEntity, statement);
 
             const comment = document.querySelector("#comment");
 
@@ -184,7 +189,7 @@ async function handleParams() {
             commentTitle.innerHTML = "New statement:"
 
             let newStatementQuery = document.createElement('code');
-            newStatementQuery.innerHTML = `<i>wd:${params['inputEntity']} wdt:${params['inputNewProperty']} wd:${params['inputNewEntity']}</i>`
+            newStatementQuery.innerHTML = `<i>wd:${inputEntity} wdt:${inputNewProperty} wd:${inputNewEntity}</i>`
 
             comment.appendChild(commentTitle);
             comment.appendChild(newStatementQuery);
@@ -200,14 +205,14 @@ async function handleParams() {
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "failure")
 
-            resultItem.innerHTML = `<u>${params['inputEntity']}</u> <b>is involved</b> in AP1 with <u>${antipatterns['existent']}</u>.`
+            resultItem.innerHTML = `<u>${inputEntity}</u> <b>is involved</b> in AP1 with <u>${antipatterns['existent']}</u>.`
             results.appendChild(resultItem);
         } else {
             const results = document.querySelector("#results");
 
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "success")
-            resultItem.innerHTML = `<u>${params['inputEntity']}</u> <b>is not involved</b> in AP1.`
+            resultItem.innerHTML = `<u>${inputEntity}</u> <b>is not involved</b> in AP1.`
 
             results.appendChild(resultItem);
         }
@@ -215,13 +220,13 @@ async function handleParams() {
             const results = document.querySelector("#results");
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "failure")
-            resultItem.innerHTML = `<u>${params['inputEntity']}</u> <b>would be involved</b> in AP1 with <u>${antipatterns['new']}</u> regarding the new statement.`
+            resultItem.innerHTML = `<u>${inputEntity}</u> <b>would be involved</b> in AP1 with <u>${antipatterns['new']}</u> regarding the new statement.`
             results.appendChild(resultItem);
         } else if (params['analysis-option'] == 'new') {
             const results = document.querySelector("#results");
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "success")
-            resultItem.innerHTML = `<u>${params['inputEntity']}</u> <b>would not be involved</b> in AP1 regarding the new statement.`
+            resultItem.innerHTML = `<u>${inputEntity}</u> <b>would not be involved</b> in AP1 regarding the new statement.`
             results.appendChild(resultItem);
         }
     } else {
