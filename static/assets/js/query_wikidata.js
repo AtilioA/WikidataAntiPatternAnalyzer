@@ -140,8 +140,8 @@ async function checkForAntipatternUp(entity, statement) {
     }
 
     let antipatternsUp = {
-        existent: QIDsExistent,
-        new: QIDsNew,
+        existent: [...QIDsExistent],
+        new: [...QIDsNew],
     }
 
     return antipatternsUp;
@@ -177,8 +177,8 @@ async function checkForAntipatternDown(entity, statement) {
     }
 
     let antipatternsDown = {
-        existent: QIDsInstancesAndSubclasses,
-        new: QIDsNew,
+        existent: [...QIDsInstancesAndSubclasses],
+        new: [...QIDsNew],
     }
 
     return antipatternsDown;
@@ -215,13 +215,17 @@ async function getLabelsBulk(entities) {
     QUERY_LABEL_STRING += "}"
 
     const response = await getRequestEndpoint(QUERY_LABEL_STRING);
+    // console.log(response)
     const results = Object.values(response['results']['bindings'][0]);
 
     const labels = results.map(result => result['value']);
 
+    // console.log(entities, labels)
+
     nEntities = 0;
     const labelsDict = {}
     for (let entity of entities) {
+        // console.log(entity)
         labelsDict[entity] = labels[nEntities];
         nEntities++;
     }
@@ -233,7 +237,7 @@ function createMultipleEntitiesLabelsString(entities, labels) {
     let nEntities = 1;
     let entitiesString = "";
 
-    console.log(entities, labels)
+    // console.log(entities, labels)
 
     for (entity of entities) {
         entitiesString += `${labels[entity]} (<u>${entity}</u>)`
@@ -299,9 +303,11 @@ async function handleParams() {
     antipatternsDownExistentQuantity = antipatternsDown['existent'].length
     antipatternsUpNewQuantity = antipatternsUp['new'].length
     antipatternsDownNewQuantity = antipatternsDown['new'].length
+
     // Limit lists of entities to MAX_ITEMS
     antipatternsUp['existent'].splice(MAX_ITEMS)
     antipatternsDown['existent'].splice(MAX_ITEMS)
+    console.log(antipatternsUp)
     antipatternsUp['new'].splice(MAX_ITEMS)
     antipatternsDown['new'].splice(MAX_ITEMS)
 
@@ -312,6 +318,7 @@ async function handleParams() {
         inputEntity, inputNewEntity
     ]
     allLabels = await getLabelsBulk(allEntities)
+    console.log(allLabels)
 
     if (antipatternsUp) {
         if (antipatternsUp['existent'].length > 0) {
@@ -352,7 +359,7 @@ async function handleParams() {
             if (antipatternsUp['new'].length > 1) {
                 resultItem.innerHTML += `, [...] (${antipatternsUpNewQuantity} entities) <b>would be</b> both instances and subclasses of <u></u>\nif ${allLabels[inputEntity]} (<u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<u>${inputNewEntity}</u>).`
             } else {
-                resultItem.innerHTML += ` <b>would be</b> both instance and subclass of <u></u>\nif <u>${inputEntity}</u> were ${getPropertyLabel(inputNewProperty)} ${inputNewEntity}.`
+                resultItem.innerHTML += ` <b>would be</b> both instance and subclass of <u></u>\nif ${allLabels[inputEntity]} (<u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<u>${inputNewEntity}</u>).`
             }
 
             resultsUp.appendChild(resultItem);
