@@ -2,7 +2,7 @@ const BASE_URL = "https://query.wikidata.org/sparql?query="
 const headers = {
     Accept: "application/sparql-results+json"
 }
-// FILTER ( NOT EXISTS { wd:Q151885 wdt:P31 wd:Q23958852 } )
+
 // const fetch = require('node-fetch')
 
 
@@ -70,8 +70,6 @@ async function areInstancesBulk(instance, entities) {
     }
     P31_QUERY += "}"
 
-    // console.log(P31_QUERY);
-
     try {
         let request = await fetch(BASE_URL + encodeURIComponent(P31_QUERY), { headers })
 
@@ -111,7 +109,6 @@ async function checkForAntipatternUp(entity, statement) {
     const queryString = buildQueryString(entity, AP1_QUERY_TEMPLATE_UP);
 
     const response = await getRequestEndpoint(queryString);
-    console.log(response);
     const results = response['results']['bindings'] || [];
 
     let QIDsExistent = results.map(parseQueryResponseValue);
@@ -138,15 +135,11 @@ async function checkForAntipatternUp(entity, statement) {
         new: QIDsNew,
     }
 
-    console.log(antipatternsUp);
-
     return antipatternsUp;
 }
 
 async function checkNewAP1Down(entity, newEntity) {
     const AP1_QUERY_DOWN_NEW_P279 = `SELECT ?subject WHERE { ?subject wdt:P31 wd:${entity} . ?subject wdt:P279+ wd:${entity} . ?subject wdt:P31 wd:${newEntity} . }`
-
-    // console.log(AP1_QUERY_DOWN_NEW_P279);
 
     const response = await getRequestEndpoint(AP1_QUERY_DOWN_NEW_P279);
     const results = response['results']['bindings'];
@@ -164,7 +157,6 @@ async function checkForAntipatternDown(entity, statement) {
     const response = await getRequestEndpoint(queryString);
     const results = response['results']['bindings'];
     let QIDsInstancesAndSubclasses = results.map(parseQueryResponseValue);
-    // console.log(QIDsInstancesAndSubclasses);
 
     // Check for AP1 with new statement
     // New statements with 'P31' property won't generate new violations below entity, so we don't need to check for it
@@ -179,9 +171,6 @@ async function checkForAntipatternDown(entity, statement) {
         existent: QIDsInstancesAndSubclasses,
         new: QIDsNew,
     }
-
-    // console.log(antipatternsDown);
-    console.log("Labels", await getLabelsBulk(antipatternsDown['existent'].slice(0,3)));
 
     return antipatternsDown;
 }
@@ -216,9 +205,6 @@ async function getLabelsBulk(entities) {
     }
     QUERY_LABEL_STRING += "}"
 
-    // console.log(QUERY_LABEL_STRING);
-    // console.log(entities);
-
     const response = await getRequestEndpoint(QUERY_LABEL_STRING);
     const results = Object.values(response['results']['bindings'][0]);
 
@@ -236,6 +222,7 @@ async function getLabelsBulk(entities) {
 
 async function handleParams() {
     const MAX_ITEMS = 5; // Limit number of entities to be shown
+
     params = getUrlVars();
     let antipatternsUp, antipatternsDown;
 
@@ -243,18 +230,20 @@ async function handleParams() {
     const inputNewProperty = params["inputNewProperty"].toUpperCase();
     const inputNewEntity = params["inputNewEntity"].toUpperCase();
 
+    // Show "Loading..." on page while results aren't ready
     const results = document.querySelector("#prompt h2");
-
     let resultsTitle = document.createElement('h2');
     resultsTitle.innerHTML = "Loading...";
     results.appendChild(resultsTitle);
 
     switch (params['analysis-option']) {
         case 'existent':
+            // Check only for existing anti-patterns
             antipatternsUp = await checkForAntipatternUp(inputEntity);
             antipatternsDown = await checkForAntipatternDown(inputEntity);
             break;
         case 'new':
+            // Check also for hypothetical anti-patterns
             const statement = {
                 newEntity: inputNewEntity,
                 newProperty: inputNewProperty
@@ -262,6 +251,7 @@ async function handleParams() {
             antipatternsUp = await checkForAntipatternUp(inputEntity, statement);
             antipatternsDown = await checkForAntipatternDown(inputEntity, statement);
 
+            // Display hypothetical statement on page
             const comment = document.querySelector("#comment");
 
             let commentTitle = document.createElement('p');
@@ -291,7 +281,7 @@ async function handleParams() {
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "failure")
 
-            resultItem.innerHTML = `<u>${inputEntity}</u> <b>is</b> instance and subclass of <u>${antipatternsUp['existent'].slice(0, 5).join(", ")}</u>.`
+            // TODO: if length > 1 [...]
             resultsUp.appendChild(resultItem);
         } else {
             const resultsUp = document.querySelector("#results-up");
@@ -322,6 +312,8 @@ async function handleParams() {
 
             resultsUp.appendChild(resultItem);
         }
+    } else {
+        console.log(`Failed to acquire results for anti-patterns above ${inputEntity}.`)
     }
     if (antipatternsDown) {
         if (antipatternsDown['existent'].length > 0) {
@@ -363,7 +355,7 @@ async function handleParams() {
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "failure")
 
-            // TODO: if length [...]
+            // TODO: if length > 1 [...]
             const stringEntitiesNew = await getStringListEntities(antipatternsDown['new'].slice(0, 5))
             resultItem.innerHTML = `<u>${stringEntitiesNew}</u> <b>would be</b> both instances and subclasses of <u>${inputEntity}</u>.`
             resultsDown.appendChild(resultItem);
@@ -377,8 +369,9 @@ async function handleParams() {
             resultsDown.appendChild(resultItem);
         }
     } else {
-        console.log(`Failed to acquire results for anti-patterns above ${inputEntity}.`)
+        console.log(`Failed to acquire results for anti-patterns below ${inputEntity}.`)
     }
+
     results.removeChild(resultsTitle);
 }
 
@@ -388,7 +381,3 @@ handleParams()
 // checkForAntipatternDown("Q34770", {newProperty: "P279", newEntity: "Q1288568"})
 // checkForAntipatternDown("Q618779", {newProperty: "P279", newEntity: "Q51067"})
 // checkForAntipatternDown("Q41710")
-
-//  ?item wdt:P31 wd:Q34770 .
-// ?item wdt:P279+ wd:Q34770 .
-// ?item wdt:P31 wd:Q1288568 .
