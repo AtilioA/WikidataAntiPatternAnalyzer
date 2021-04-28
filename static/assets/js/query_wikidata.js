@@ -2,8 +2,8 @@ const BASE_URL = "https://query.wikidata.org/sparql?query="
 const headers = {
     Accept: "application/sparql-results+json"
 }
-
-const fetch = require('node-fetch')
+// FILTER ( NOT EXISTS { wd:Q151885 wdt:P31 wd:Q23958852 } )
+// const fetch = require('node-fetch')
 
 
 let buildQueryString = (queryEntity, queryString, replaceProperty) => {
@@ -14,7 +14,7 @@ let buildQueryString = (queryEntity, queryString, replaceProperty) => {
     }
 }
 
-async function getRequestEndpointAP1(queryString) {
+async function getRequestEndpoint(queryString) {
     try {
         let request = await fetch(BASE_URL + encodeURIComponent(queryString), { headers })
 
@@ -70,7 +70,7 @@ async function areInstancesBulk(instance, entities) {
     }
     P31_QUERY += "}"
 
-    console.log(P31_QUERY);
+    // console.log(P31_QUERY);
 
     try {
         let request = await fetch(BASE_URL + encodeURIComponent(P31_QUERY), { headers })
@@ -94,8 +94,12 @@ async function areInstancesBulk(instance, entities) {
     }
 }
 
-let parseResultValues = (result) => {
-    return result['subject' || 'object']['value'].match(/Q\w+/)[0];
+let parseQueryResponseValue = (result) => {
+    try {
+        return result['subject']['value'].match(/Q\w+/)[0];
+    } catch {
+        return result['object']['value'].match(/Q\w+/)[0];
+    }
 }
 
 async function checkForAntipatternUp(entity, statement) {
@@ -106,10 +110,11 @@ async function checkForAntipatternUp(entity, statement) {
     // Check for existing AP1
     const queryString = buildQueryString(entity, AP1_QUERY_TEMPLATE_UP);
 
-    const response = await getRequestEndpointAP1(queryString);
-    const results = response['results']['bindings'];
+    const response = await getRequestEndpoint(queryString);
+    console.log(response);
+    const results = response['results']['bindings'] || [];
 
-    let QIDsExistent = results.map(parseResultValues);
+    let QIDsExistent = results.map(parseQueryResponseValue);
 
     // Check for AP1 with new statement
     let QIDsNew = [];
@@ -119,9 +124,10 @@ async function checkForAntipatternUp(entity, statement) {
             QIDsNew = newEntity; // then it is a violation
         }
     }
+    // TODO REFACTOR: Use single SPARQL query
     else if (newProperty == "P279") { // "entity P279 newEntity" is true
         const superclassesQuery = await queryP279(newEntity, '?object'); // get all newEntity's superclasses
-        const superclasses = superclassesQuery['results']['bindings'].map(parseResultValues);
+        const superclasses = superclassesQuery['results']['bindings'].map(parseQueryResponseValue);
         superclasses.push(newEntity);
         let areInstances = await areInstancesBulk(entity, superclasses); // is entity P31 newEntity or its superclasses also true?
         QIDsNew = areInstances['true'];
@@ -129,7 +135,7 @@ async function checkForAntipatternUp(entity, statement) {
 
     let antipatternsUp = {
         existent: QIDsExistent,
-        new: QIDsNew
+        new: QIDsNew,
     }
 
     console.log(antipatternsUp);
@@ -137,28 +143,48 @@ async function checkForAntipatternUp(entity, statement) {
     return antipatternsUp;
 }
 
+async function checkNewAP1Down(entity, newEntity) {
+    const AP1_QUERY_DOWN_NEW_P279 = `SELECT ?subject WHERE { ?subject wdt:P31 wd:${entity} . ?subject wdt:P279+ wd:${entity} . ?subject wdt:P31 wd:${newEntity} . }`
+
+    // console.log(AP1_QUERY_DOWN_NEW_P279);
+
+    const response = await getRequestEndpoint(AP1_QUERY_DOWN_NEW_P279);
+    const results = response['results']['bindings'];
+
+    return results;
+}
 
 async function checkForAntipatternDown(entity, statement) {
     const AP1_QUERY_TEMPLATE_DOWN = `SELECT * WHERE { ?subject wdt:P31 wd:Q31 . ?subject wdt:P279+ wd:Q279  . }`
 
     let { newEntity, newProperty } = (statement || { undefined });
 
+    // Query for entities that are both instance of "entity" and subclass of "entity"
     const queryString = buildQueryString(entity, AP1_QUERY_TEMPLATE_DOWN);
-    console.log(queryString);
-    const response = await getRequestEndpointAP1(queryString);
+    const response = await getRequestEndpoint(queryString);
     const results = response['results']['bindings'];
+    let QIDsInstancesAndSubclasses = results.map(parseQueryResponseValue);
+    // console.log(QIDsInstancesAndSubclasses);
 
-    let QIDsInstancesAndSubclasses = results.map(parseResultValues);
-    console.log(QIDsInstancesAndSubclasses);
-
-    let antipatternsUp = {
-        existent: QIDsInstancesAndSubclasses,
-        new: QIDsNew
+    // Check for AP1 with new statement
+    // New statements with 'P31' property won't generate new violations below entity, so we don't need to check for it
+    let QIDsNew = [];
+    if (newProperty == "P279") { // "entity P279 newEntity" would be true
+        // Query for subclasses of "entity" are instances of "newEntity"
+        let resultsAP1Down = await checkNewAP1Down(entity, newEntity);
+        QIDsNew = resultsAP1Down.map(parseQueryResponseValue)
     }
 
-    return antipatternsUp;
-}
+    let antipatternsDown = {
+        existent: QIDsInstancesAndSubclasses,
+        new: QIDsNew,
+    }
 
+    // console.log(antipatternsDown);
+    console.log("Labels", await getLabelsBulk(antipatternsDown['existent'].slice(0,3)));
+
+    return antipatternsDown;
+}
 
 function getUrlVars() {
     var vars = {};
@@ -168,13 +194,58 @@ function getUrlVars() {
     return vars;
 }
 
+async function getStringListEntities(entities) {
+    let string = "";
+    const labels = await getLabelsBulk(entities);
+    for ([index, entity] of entities.entries()) {
+        string += `${labels[entity]} (${entity})`
+        if (index + 1 != entities.length) { string += ', ' }
+    }
+
+    return string;
+}
+
+async function getLabelsBulk(entities) {
+    let QUERY_LABEL_STRING = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nSELECT * WHERE { "
+    let nEntities = 0;
+    for (let entity of entities) {
+        QUERY_LABEL_STRING += `wd:${entity} rdfs:label ?subjectLabel${nEntities} .\n FILTER (lang(?subjectLabel${nEntities}) = "" || lang(?subjectLabel${nEntities}) = "en") .\n`
+        nEntities++;
+    }
+    QUERY_LABEL_STRING += "}"
+
+    // console.log(QUERY_LABEL_STRING);
+    // console.log(entities);
+
+    const response = await getRequestEndpoint(QUERY_LABEL_STRING);
+    const results = Object.values(response['results']['bindings'][0]);
+
+    const labels = results.map(result => result['value']);
+
+    nEntities = 0;
+    const labelsDict = {}
+    for (let entity of entities) {
+        labelsDict[entity] = labels[nEntities];
+        nEntities++;
+    }
+    console.log(labelsDict);
+
+    return labelsDict
+}
+
 async function handleParams() {
     params = getUrlVars();
-    let antipatternsUp, antipatternsUp;
+    let antipatternsUp, antipatternsDown;
 
     const inputEntity = params["inputEntity"].toUpperCase();
     const inputNewProperty = params["inputNewProperty"].toUpperCase();
     const inputNewEntity = params["inputNewEntity"].toUpperCase();
+
+    const results = document.querySelector("#prompt h2");
+
+    let resultsTitle = document.createElement('h2');
+    resultsTitle.innerHTML = "Loading...";
+    results.appendChild(resultsTitle);
 
     switch (params['analysis-option']) {
         case 'existent':
@@ -205,81 +276,109 @@ async function handleParams() {
     }
     if (antipatternsUp) {
         if (antipatternsUp['existent'].length > 0) {
-            const results = document.querySelector("#results");
+            const resultsUp = document.querySelector("#results-up");
 
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "failure")
 
-            resultItem.innerHTML = `<u>${inputEntity}</u> <b>is involved</b> in AP1 with <u>${antipatternsUp['existent']}</u>.`
-            results.appendChild(resultItem);
+            resultItem.innerHTML = `<u>${inputEntity}</u> <b>is</b> instance and subclass of <u>${antipatternsUp['existent'].slice(0, 5).join(", ")}</u>.`
+            resultsUp.appendChild(resultItem);
         } else {
-            const results = document.querySelector("#results");
+            const resultsUp = document.querySelector("#results-up");
 
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "success")
-            resultItem.innerHTML = `<u>${inputEntity}</u> <b>is not involved</b> in AP1.`
+            resultItem.innerHTML = `<u>${inputEntity}</u> <b>is not</b> instance and subclass of any other entity.`
 
-            results.appendChild(resultItem);
+            resultsUp.appendChild(resultItem);
         }
         if (antipatternsUp['new'].length > 0) {
-            const results = document.querySelector("#results");
+            const resultsUp = document.querySelector("#results-up");
 
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "failure")
-            resultItem.innerHTML = `<u>${inputEntity}</u> <b>would be involved</b> in AP1 with <u>${antipatternsUp['new']}</u> regarding the new statement.`
+            // TODO: if length [...]
+            resultItem.innerHTML = `<u>${inputEntity}</u> <b>would be</b> both instance and subclass of <u>${antipatternsUp['new'].slice(0, 5)}</u>\nif <u>${inputEntity}</u> were instance/subclass of ${inputNewEntity}.`
 
-            results.appendChild(resultItem);
+            resultsUp.appendChild(resultItem);
         } else if (params['analysis-option'] == 'new') {
-            const results = document.querySelector("#results");
+            const resultsUp = document.querySelector("#results-up");
 
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "success")
-            resultItem.innerHTML = `<u>${inputEntity}</u> <b>would not be involved</b> in AP1 regarding the new statement.`
 
-            results.appendChild(resultItem);
+            // TODO: if length [...]
+            resultItem.innerHTML = `<u>${inputEntity}</u> <b>would not be</b> both instance and subclass of any other entity\nif <u>${inputEntity}</u> were instance/subclass of ${inputNewEntity}.`
+
+            resultsUp.appendChild(resultItem);
         }
+    }
     if (antipatternsDown) {
         if (antipatternsDown['existent'].length > 0) {
-            const results = document.querySelector("#results");
+            const resultsDown = document.querySelector("#results-down");
 
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "failure")
 
-            resultItem.innerHTML = `<u>${inputEntity}</u> <b>is involved</b> in AP1 with <u>${antipatternsDown['existent']}</u>.`
-            results.appendChild(resultItem);
+            // TODO: if length [...]
+            // const stringEntitiesExistent = await getStringListEntities(antipatternsDown['existent'].slice(0, 5))
+            const labelsDown = await getLabelsBulk(antipatternsDown['existent'].slice(0, 5));
+            console.log(antipatternsDown['existent'].slice(1).values());
+
+            resultItem.innerHTML = `${antipatternsDown['existent'][0]} (<u>${labelsDown[antipatternsDown['existent'][0]]}</u>), `
+            let nEntities = 1;
+            for (entity of antipatternsDown['existent'].slice(1, 5)) {
+                resultItem.innerHTML += `${antipatternsDown['existent'][nEntities]} (<u>${labelsDown[antipatternsDown['existent'][nEntities]]}</u>)`
+
+                if (nEntities != antipatternsDown['existent'].slice(1, 5).length) {
+                    resultItem.innerHTML += ', '
+                }
+                nEntities++;
+            }
+
+            resultItem.innerHTML += ` <b>are</b> both instances and subclasses of <u>${inputEntity}</u>.`
+            resultsDown.appendChild(resultItem);
         } else {
-            const results = document.querySelector("#results");
+            const resultsUp = document.querySelector("#results-down");
 
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "success")
-            resultItem.innerHTML = `<u>${inputEntity}</u> <b>is not involved</b> in AP1.`
+            resultItem.innerHTML = `<b>There are no entities</b> both instances and subclasses of <u>${inputEntity}</u>.`
 
-            results.appendChild(resultItem);
+            resultsUp.appendChild(resultItem);
         }
         if (antipatternsDown['new'].length > 0) {
-            const results = document.querySelector("#results");
+            const resultsDown = document.querySelector("#results-down");
 
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "failure")
-            resultItem.innerHTML = `<u>${inputEntity}</u> <b>would be involved</b> in AP1 with <u>${antipatternsDown['new']}</u> regarding the new statement.`
 
-            results.appendChild(resultItem);
+            // TODO: if length [...]
+            const stringEntitiesNew = await getStringListEntities(antipatternsDown['new'].slice(0, 5))
+            resultItem.innerHTML = `<u>${stringEntitiesNew}</u> <b>would be</b> both instances and subclasses of <u>${inputEntity}</u>.`
+            resultsDown.appendChild(resultItem);
         } else if (params['analysis-option'] == 'new') {
-            const results = document.querySelector("#results");
+            const resultsDown = document.querySelector("#results-down");
 
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "success")
-            resultItem.innerHTML = `<u>${inputEntity}</u> <b>would not be involved</b> in AP1 regarding the new statement.`
+            resultItem.innerHTML = `<b>There would be no entities</b> both instances and subclasses of <u>${inputEntity}</u>.`
 
-            results.appendChild(resultItem);
+            resultsDown.appendChild(resultItem);
         }
     } else {
         console.log(`Failed to acquire results for anti-patterns above ${inputEntity}.`)
     }
+    results.removeChild(resultsTitle);
 }
 
-// handleParams()
+handleParams()
 // checkForAntipatternDown("Q282")
 // checkForAntipatternDown("Q12737077")
-checkForAntipatternDown("Q618779")
+// checkForAntipatternDown("Q34770", {newProperty: "P279", newEntity: "Q1288568"})
+// checkForAntipatternDown("Q618779", {newProperty: "P279", newEntity: "Q51067"})
 // checkForAntipatternDown("Q41710")
+
+//  ?item wdt:P31 wd:Q34770 .
+// ?item wdt:P279+ wd:Q34770 .
+// ?item wdt:P31 wd:Q1288568 .
