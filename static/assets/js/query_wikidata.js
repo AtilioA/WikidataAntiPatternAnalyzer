@@ -209,8 +209,10 @@ async function getLabelsBulk(entities) {
     let QUERY_LABEL_STRING = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nSELECT * WHERE { "
     let nEntities = 0;
     for (let entity of entities) {
+        if (entity) {
         QUERY_LABEL_STRING += `wd:${entity} rdfs:label ?subjectLabel${nEntities} .\n FILTER (lang(?subjectLabel${nEntities}) = "" || lang(?subjectLabel${nEntities}) = "en") .\n`
         nEntities++;
+    }
     }
     QUERY_LABEL_STRING += "}"
 
