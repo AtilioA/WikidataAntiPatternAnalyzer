@@ -29,14 +29,13 @@ body {
 
 div#title {
     font-size: 24px;
-    margin-top: -30px;
-    margin-bottom: 10px;
 }
 
 div#title h1 {
+    margin-top: 0px;
+    margin-bottom: 0px;
     font-weight: normal;
 }
-
 
 h1 {
     font-family: Adamina, serif;
@@ -170,12 +169,29 @@ div#comment p {
 }
 
 div#footer {
+    font-size: 14px;
     position: absolute;
     bottom: 0;
 }
 
 div#footer a {
+    font-size: 14px;
     font-family: "Red Hat Text";
     color: #006699;
     text-decoration: none;
+}
+
+div#disclaimer {
+    background: #ccc;
+    margin: 20px;
+    padding: 0px 10px 0px 10px;
+    font-size: 14px;
+    line-height: 4px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+div#disclaimer a {
+    /* text-decoration: none; */
+    color: inherit;
 }
