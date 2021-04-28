@@ -9,4 +9,8 @@ $(document).ready(function() {
         $("textInputDiv").hide();
         $("#show-"+optionValue).show();
     });
+    $('input[type="radio"]#new-antipattern').click(function() {
+        $('input[type="text"]#inputNewProperty')[0].setAttribute("required", true);
+        $('input[type="text"]#inputNewEntity')[0].setAttribute("required", true);
+    });
 });
