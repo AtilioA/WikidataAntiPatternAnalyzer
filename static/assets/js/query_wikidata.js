@@ -230,12 +230,12 @@ async function getLabelsBulk(entities) {
         labelsDict[entity] = labels[nEntities];
         nEntities++;
     }
-    console.log(labelsDict);
 
     return labelsDict
 }
 
 async function handleParams() {
+    const MAX_ITEMS = 5; // Limit number of entities to be shown
     params = getUrlVars();
     let antipatternsUp, antipatternsDown;
 
@@ -276,6 +276,14 @@ async function handleParams() {
         default:
             console.log("Unrecognized option.")
     }
+
+    const allEntities = [
+        ...antipatternsUp['existent'].slice(0, MAX_ITEMS), ...antipatternsUp['new'].slice(0, MAX_ITEMS),
+        ...antipatternsDown['existent'].slice(0, MAX_ITEMS), ...antipatternsDown['new'].slice(0, MAX_ITEMS),
+        inputEntity, inputNewEntity
+    ]
+    allLabels = await getLabelsBulk(allEntities)
+
     if (antipatternsUp) {
         if (antipatternsUp['existent'].length > 0) {
             const resultsUp = document.querySelector("#results-up");
