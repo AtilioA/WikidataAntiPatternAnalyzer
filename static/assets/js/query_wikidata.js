@@ -320,15 +320,16 @@ async function handleParams() {
     allLabels = await getLabelsBulk(allEntities)
     console.log(allLabels)
 
+
     if (antipatternsUp) {
-        if (antipatternsUp['existent'].length > 0) {
             const resultsUp = document.querySelector("#results-up");
 
+        if (antipatternsUp['existent'].length > 0) {
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "failure")
 
             const existentMultipleStringUp = createMultipleEntitiesLabelsString(antipatternsUp['existent'], allLabels)
-            resultItem.innerHTML = `${allLabels[inputEntity]} (<u>${inputEntity}</u>) <b>is</b> instance and subclass of `
+            resultItem.innerHTML = `${allLabels[inputNewEntity]} (<u>${inputEntity}</u>) <b>is</b>, simultaneously, instance and subclass of `
             resultItem.innerHTML += existentMultipleStringUp;
 
             if (antipatternsUp['new'].length > MAX_ITEMS) {
@@ -338,29 +339,19 @@ async function handleParams() {
 
             resultsUp.appendChild(resultItem);
         } else {
-            const resultsUp = document.querySelector("#results-up");
-
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "success")
-            resultItem.innerHTML = `${allLabels[inputEntity]} (<u>${inputEntity}</u>) <b>is not</b> instance and subclass of any other entity.`
+            resultItem.innerHTML = `${allLabels[inputEntity]} (<u>${inputEntity}</u>) <b>is not</b>, simultaneously, instance and subclass of another entity.`
 
             resultsUp.appendChild(resultItem);
         }
 
         if (antipatternsUp['new'].length > 0) {
-            const resultsUp = document.querySelector("#results-up");
-
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "failure")
 
-            const newMultipleString = createMultipleEntitiesLabelsString(antipatternsUp['new'], allLabels)
-            resultItem.innerHTML = newMultipleString;
-
-            if (antipatternsUp['new'].length > 1) {
-                resultItem.innerHTML += `, [...] (${antipatternsUpNewQuantity} entities) <b>would be</b> both instances and subclasses of <u></u>\nif ${allLabels[inputEntity]} (<u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<u>${inputNewEntity}</u>).`
-            } else {
-                resultItem.innerHTML += ` <b>would be</b> both instance and subclass of <u></u>\nif ${allLabels[inputEntity]} (<u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<u>${inputNewEntity}</u>).`
-            }
+            const newMultipleStringUp = createMultipleEntitiesLabelsString(antipatternsUp['new'], allLabels)
+            resultItem.innerHTML = `${allLabels[inputEntity]} (<u>${inputEntity}</u>) <b>would be</b>, simultaneously, instance and subclass of ${newMultipleStringUp}\n if ${allLabels[inputEntity]} (<u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<u>${inputNewEntity}</u>)`;
 
             resultsUp.appendChild(resultItem);
         } else if (params['analysis-option'] == 'new') {
@@ -369,7 +360,7 @@ async function handleParams() {
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "success")
 
-            resultItem.innerHTML = `${allLabels[inputEntity]} (<u>${inputEntity}</u>) <b>would not be</b> both instance and subclass of any other entity\nif ${allLabels[inputEntity]} (<u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<u>${inputNewEntity}</u>).`
+            resultItem.innerHTML = `${allLabels[inputEntity]} (<u>${inputEntity}</u>) <b>would not be</b>, simultaneously, instance and subclass of any other entity\nif ${allLabels[inputEntity]} (<u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<u>${inputNewEntity}</u>).`
 
             resultsUp.appendChild(resultItem);
         }
@@ -378,9 +369,8 @@ async function handleParams() {
     }
 
     if (antipatternsDown) {
-        if (antipatternsDown['existent'].length > 0) {
             const resultsDown = document.querySelector("#results-down");
-
+        if (antipatternsDown['existent'].length > 0) {
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "failure")
 
@@ -388,9 +378,9 @@ async function handleParams() {
             resultItem.innerHTML += existentMultipleStringDown;
 
             if (antipatternsDown['existent'].length > 1) {
-                resultItem.innerHTML += `, [...] (${antipatternsDownExistentQuantity} entities) <b>are</b> both instances and subclasses of ${allLabels[inputEntity]} (<u>${inputEntity}</u>).`
+                resultItem.innerHTML += `, [...] (${antipatternsDownExistentQuantity} entities) <b>are</b>, simultaneously, instances and subclasses of ${allLabels[inputEntity]} (<u>${inputEntity}</u>).`
             } else {
-                resultItem.innerHTML += ` <b>is</b> both instance and subclass of  ${allLabels[inputEntity]} (<u>${inputEntity}</u>).`
+                resultItem.innerHTML += ` <b>is</b>, simultaneously, instance and subclass of  ${allLabels[inputEntity]} (<u>${inputEntity}</u>).`
             }
             resultsDown.appendChild(resultItem);
         } else {
@@ -398,39 +388,32 @@ async function handleParams() {
 
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "success")
-            resultItem.innerHTML = `<b>There are no entities</b> both instances and subclasses of ${allLabels[inputEntity]} (<u>${inputEntity}</u>).`
+            resultItem.innerHTML = `<b>There are no entities</b> that are, simultaneously, instances and subclasses of ${allLabels[inputEntity]} (<u>${inputEntity}</u>).`
 
             resultsUp.appendChild(resultItem);
         }
 
         if (antipatternsDown['new'].length > 0) {
-            const resultsDown = document.querySelector("#results-down");
-
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "failure")
 
-            // TODO: if length > 1 [...]
-            const stringEntitiesNew = await getStringListEntities(antipatternsDown['new'])
+            const newMultipleStringDown = await getStringListEntities(antipatternsDown['new'])
             if (antipatternsDown['existent'].length > 1) {
-                resultItem.innerHTML = `${stringEntitiesNew} (${antipatternsDownNewQuantity} entities) <b>would be</b> both instances and subclasses of <u>${inputEntity}</u>.`
+                resultItem.innerHTML = `${newMultipleStringDown} (${antipatternsDownNewQuantity} entities) <b>would be</b>, simultaneously, instances and subclasses of <u>${inputEntity}</u>.`
             } else {
-                resultItem.innerHTML = `${stringEntitiesNew} <b>would be</b> both instance and subclass of <u>${inputEntity}</u>.`
+                resultItem.innerHTML = `${newMultipleStringDown} <b>would be</b>, simultaneously, instance and subclass of <u>${inputEntity}</u>.`
             }
             resultsDown.appendChild(resultItem);
         } else if (params['analysis-option'] == 'new') {
-            const resultsDown = document.querySelector("#results-down");
-
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "success")
-            resultItem.innerHTML = `<b>There would be no entities</b> both instances and subclasses of ${allLabels[inputEntity]} (<u>${inputEntity}</u>)\nif ${allLabels[inputEntity]} (<u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<u>${inputNewEntity}</u>).`
+            resultItem.innerHTML = `<b>There would be no entities</b> that are, simultaneously, instances and subclasses of ${allLabels[inputEntity]} (<u>${inputEntity}</u>)\nif ${allLabels[inputEntity]} (<u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<u>${inputNewEntity}</u>).`
 
             resultsDown.appendChild(resultItem);
         }
     } else {
         console.log(`Failed to acquire results for anti-patterns below ${inputEntity}.`)
     }
-
-    results.removeChild(resultsTitle);
 }
 
 handleParams()
