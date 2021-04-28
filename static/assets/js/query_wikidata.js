@@ -220,6 +220,24 @@ async function getLabelsBulk(entities) {
     return labelsDict
 }
 
+function createMultipleEntitiesLabelsString(entities, labels) {
+    let nEntities = 1;
+    let entitiesString = "";
+
+    console.log(entities, labels)
+
+    for (entity of entities) {
+        entitiesString += `${labels[entity]} (<u>${entity}</u>)`
+
+        if (nEntities != entities.length) {
+            entitiesString += ', '
+        }
+        nEntities++;
+    }
+
+    return entitiesString;
+}
+
 async function handleParams() {
     const MAX_ITEMS = 5; // Limit number of entities to be shown
 
