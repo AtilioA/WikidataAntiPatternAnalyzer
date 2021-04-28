@@ -248,7 +248,7 @@ function createMultipleEntitiesLabelsString(entities, labels) {
 }
 
 async function handleParams() {
-    const MAX_ITEMS = 5; // Limit number of entities to be shown
+    const MAX_ITEMS = 3; // Limit number of entities to be shown
 
     params = getUrlVars();
     let antipatternsUp, antipatternsDown;
@@ -294,11 +294,16 @@ async function handleParams() {
             console.log("Unrecognized option.")
     }
 
+    // Save quantity of entities
+    antipatternsUpExistentQuantity = antipatternsUp['existent'].length
+    antipatternsDownExistentQuantity = antipatternsDown['existent'].length
+    antipatternsUpNewQuantity = antipatternsUp['new'].length
+    antipatternsDownNewQuantity = antipatternsDown['new'].length
     // Limit lists of entities to MAX_ITEMS
-    antipatternsUp['new'].splice(MAX_ITEMS)
-    antipatternsDown['new'].splice(MAX_ITEMS)
     antipatternsUp['existent'].splice(MAX_ITEMS)
     antipatternsDown['existent'].splice(MAX_ITEMS)
+    antipatternsUp['new'].splice(MAX_ITEMS)
+    antipatternsDown['new'].splice(MAX_ITEMS)
 
     // Create list with all remaining entities then get labels for all of them
     const allEntities = [
@@ -318,6 +323,10 @@ async function handleParams() {
             const existentMultipleStringUp = createMultipleEntitiesLabelsString(antipatternsUp['existent'], allLabels)
             resultItem.innerHTML = `${allLabels[inputEntity]} (<u>${inputEntity}</u>) <b>is</b> instance and subclass of `
             resultItem.innerHTML += existentMultipleStringUp;
+
+            if (antipatternsUp['new'].length > MAX_ITEMS) {
+                resultItem.innerHTML += `, [...] (${antipatternsUpExistentQuantity} entities)`;
+            }
             resultItem.innerHTML += '.';
 
             resultsUp.appendChild(resultItem);
@@ -341,7 +350,7 @@ async function handleParams() {
             resultItem.innerHTML = newMultipleString;
 
             if (antipatternsUp['new'].length > 1) {
-                resultItem.innerHTML += ` <b>would be</b> both instances and subclasses of <u></u>\nif ${allLabels[inputEntity]} (<u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<u>${inputNewEntity}</u>).`
+                resultItem.innerHTML += `, [...] (${antipatternsUpNewQuantity} entities) <b>would be</b> both instances and subclasses of <u></u>\nif ${allLabels[inputEntity]} (<u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<u>${inputNewEntity}</u>).`
             } else {
                 resultItem.innerHTML += ` <b>would be</b> both instance and subclass of <u></u>\nif <u>${inputEntity}</u> were ${getPropertyLabel(inputNewProperty)} ${inputNewEntity}.`
             }
@@ -372,7 +381,7 @@ async function handleParams() {
             resultItem.innerHTML += existentMultipleStringDown;
 
             if (antipatternsDown['existent'].length > 1) {
-                resultItem.innerHTML += ` <b>are</b> both instances and subclasses of ${allLabels[inputEntity]} (<u>${inputEntity}</u>).`
+                resultItem.innerHTML += `, [...] (${antipatternsDownExistentQuantity} entities) <b>are</b> both instances and subclasses of ${allLabels[inputEntity]} (<u>${inputEntity}</u>).`
             } else {
                 resultItem.innerHTML += ` <b>is</b> both instance and subclass of  ${allLabels[inputEntity]} (<u>${inputEntity}</u>).`
             }
@@ -394,8 +403,12 @@ async function handleParams() {
             resultItem.setAttribute('class', "failure")
 
             // TODO: if length > 1 [...]
-            const stringEntitiesNew = await getStringListEntities(antipatternsDown['new'].slice(0, 5))
-            resultItem.innerHTML = `<u>${stringEntitiesNew}</u> <b>would be</b> both instances and subclasses of <u>${inputEntity}</u>.`
+            const stringEntitiesNew = await getStringListEntities(antipatternsDown['new'])
+            if (antipatternsDown['existent'].length > 1) {
+                resultItem.innerHTML = `${stringEntitiesNew} (${antipatternsDownNewQuantity} entities) <b>would be</b> both instances and subclasses of <u>${inputEntity}</u>.`
+            } else {
+                resultItem.innerHTML = `${stringEntitiesNew} <b>would be</b> both instance and subclass of <u>${inputEntity}</u>.`
+            }
             resultsDown.appendChild(resultItem);
         } else if (params['analysis-option'] == 'new') {
             const resultsDown = document.querySelector("#results-down");
