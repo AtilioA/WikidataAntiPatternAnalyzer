@@ -90,6 +90,7 @@ button {
     width: 200px;
     height: 50px;
     margin-top: 30px;
+    margin-bottom: 30px;
 
     font-family: "Red Hat Text";
     font-weight: bold;
@@ -106,13 +107,28 @@ button#start-over {
     background-color: #D94344;
 }
 
-div#results {
+div.results {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     font-family: "Red Hat Text";
     font-size: 24px;
+    word-wrap: break-word;
+    width: 75%;
+}
+
+div.results p {
+    text-align: center;
+    margin: 5px;
+}
+
+hr {
+    width: 100%;
+    border: 1px solid #777;
+    border-radius: 2px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 p.success {
@@ -135,10 +151,6 @@ p.failure b {
     background-color: #D94344;
     color: #fff;
     /* border-radius: 2px; */
-}
-
-div#results p {
-    margin: 5px;
 }
 
 div#comment {
