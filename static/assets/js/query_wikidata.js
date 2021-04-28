@@ -92,12 +92,21 @@ async function areInstancesBulk(instance, entities) {
     }
 }
 
-let parseQueryResponseValue = (result) => {
+function parseQueryResponseValue(result) {
     try {
         return result['subject']['value'].match(/Q\w+/)[0];
     } catch {
         return result['object']['value'].match(/Q\w+/)[0];
     }
+}
+
+function getPropertyLabel(property) {
+    switch(property) {
+        case "P31":
+            return "instance of";
+        case "P279":
+            return "subclass of";
+        }
 }
 
 async function checkForAntipatternUp(entity, statement) {
