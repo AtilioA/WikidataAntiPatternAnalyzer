@@ -206,6 +206,7 @@ async function getStringListEntities(entities) {
 async function getLabelsBulk(entities) {
     let QUERY_LABEL_STRING = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nSELECT * WHERE { "
     let nEntities = 0;
+
     for (let entity of entities) {
         if (entity) {
             QUERY_LABEL_STRING += `wd:${entity} rdfs:label ?subjectLabel${nEntities} .\n FILTER (lang(?subjectLabel${nEntities}) = "" || lang(?subjectLabel${nEntities}) = "en") .\n`
@@ -215,18 +216,19 @@ async function getLabelsBulk(entities) {
     QUERY_LABEL_STRING += "}"
 
     const response = await getRequestEndpoint(QUERY_LABEL_STRING);
-    // console.log(response)
-    const results = Object.values(response['results']['bindings'][0]);
-
-    const labels = results.map(result => result['value']);
-
-    // console.log(entities, labels)
 
     nEntities = 0;
-    const labelsDict = {}
-    for (let entity of entities) {
-        // console.log(entity)
-        labelsDict[entity] = labels[nEntities];
+    const labelsDict = {};
+
+    const results = response['results']['bindings'][0]
+
+    let objEntries = Object.entries(results)
+    objEntries = objEntries.sort(function(first, second) {
+        return first[0].localeCompare(second[0], undefined, { numeric: true });
+    });
+
+    for (let [entry, value] of objEntries) {
+        labelsDict[entities[nEntities]] = value['value'];
         nEntities++;
     }
 
@@ -237,10 +239,8 @@ function createMultipleEntitiesLabelsString(entities, labels) {
     let nEntities = 1;
     let entitiesString = "";
 
-    // console.log(entities, labels)
-
     for (entity of entities) {
-        entitiesString += `${labels[entity]} (<u>${entity}</u>)`
+        entitiesString += `${labels[entity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${entity}</u></a>)`
 
         if (nEntities != entities.length) {
             entitiesString += ', '
@@ -307,7 +307,6 @@ async function handleParams() {
     // Limit lists of entities to MAX_ITEMS
     antipatternsUp['existent'].splice(MAX_ITEMS)
     antipatternsDown['existent'].splice(MAX_ITEMS)
-    // console.log(antipatternsUp)
     antipatternsUp['new'].splice(MAX_ITEMS)
     antipatternsDown['new'].splice(MAX_ITEMS)
 
@@ -319,12 +318,11 @@ async function handleParams() {
     ]
 
     allLabels = await getLabelsBulk(allEntities)
-    console.log(allLabels)
 
     prompt.removeChild(promptTitle);
 
     if (antipatternsUp) {
-            const resultsUp = document.querySelector("#results-up");
+        const resultsUp = document.querySelector("#results-up");
 
         if (antipatternsUp['existent'].length > 0) {
             let resultItem = document.createElement('p');
@@ -371,7 +369,7 @@ async function handleParams() {
     }
 
     if (antipatternsDown) {
-            const resultsDown = document.querySelector("#results-down");
+        const resultsDown = document.querySelector("#results-down");
         if (antipatternsDown['existent'].length > 0) {
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "failure")

@@ -147,7 +147,7 @@ p.failure {
 
 p.success b {
     padding: 5px;
-    margin: 0px 1px 0px 1px;
+    /* margin: 0px 1px 0px 1px; */
     background-color: #339966;
     color: #fff;
     /* border-radius: 2px; */
@@ -155,7 +155,7 @@ p.success b {
 
 p.failure b {
     padding: 5px;
-    margin: 0px 1px 0px 1px;
+    /* margin: 0px 1px 0px 1px; */
     background-color: #D94344;
     color: #fff;
     /* border-radius: 2px; */
