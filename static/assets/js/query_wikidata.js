@@ -343,7 +343,7 @@ async function handleParams() {
         } else {
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "success")
-            resultItem.innerHTML = `${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${inputEntity}</u>) <b>is not</b>, simultaneously, instance and subclass of another entity.`
+            resultItem.innerHTML = `${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u>) <b>is not</b>, simultaneously, instance and subclass of another entity.`
 
             resultsUp.appendChild(resultItem);
         }
@@ -353,7 +353,7 @@ async function handleParams() {
             resultItem.setAttribute('class', "failure")
 
             const newMultipleStringUp = createMultipleEntitiesLabelsString(antipatternsUp['new'], allLabels)
-            resultItem.innerHTML = `${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${inputEntity}</u>) <b>would be</b>, simultaneously, instance and subclass of ${newMultipleStringUp}\n if ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${inputNewEntity}</u>)`;
+            resultItem.innerHTML = `${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${inputEntity}</u>) <b>would be</b>, simultaneously, instance and subclass of ${newMultipleStringUp}\n if ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${inputNewEntity}"><u>${inputNewEntity}</u>)`;
 
             resultsUp.appendChild(resultItem);
         } else if (params['analysis-option'] == 'new') {
@@ -362,7 +362,7 @@ async function handleParams() {
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "success")
 
-            resultItem.innerHTML = `${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${inputEntity}</u>) <b>would not be</b>, simultaneously, instance and subclass of any other entity\nif ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${inputNewEntity}</u>).`
+            resultItem.innerHTML = `${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u>) <b>would not be</b>, simultaneously, instance and subclass of any other entity\nif ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${inputNewEntity}"><u>${inputNewEntity}</u>).`
 
             resultsUp.appendChild(resultItem);
         }
@@ -380,9 +380,9 @@ async function handleParams() {
             resultItem.innerHTML += existentMultipleStringDown;
 
             if (antipatternsDown['existent'].length > 1) {
-                resultItem.innerHTML += `, [...] (${antipatternsDownExistentQuantity} entities) <b>are</b>, simultaneously, instances and subclasses of ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${inputEntity}</u>).`
+                resultItem.innerHTML += `, [...] (${antipatternsDownExistentQuantity} entities) <b>are</b>, simultaneously, instances and subclasses of ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u>).`
             } else {
-                resultItem.innerHTML += ` <b>is</b>, simultaneously, instance and subclass of  ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${inputEntity}</u>).`
+                resultItem.innerHTML += ` <b>is</b>, simultaneously, instance and subclass of  ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u>).`
             }
             resultsDown.appendChild(resultItem);
         } else {
@@ -390,7 +390,7 @@ async function handleParams() {
 
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "success")
-            resultItem.innerHTML = `<b>There are no entities</b> that are, simultaneously, instances and subclasses of ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${inputEntity}</u>).`
+            resultItem.innerHTML = `<b>There are no entities</b> that are, simultaneously, instances and subclasses of ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u>).`
 
             resultsUp.appendChild(resultItem);
         }
@@ -409,7 +409,7 @@ async function handleParams() {
         } else if (params['analysis-option'] == 'new') {
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "success")
-            resultItem.innerHTML = `<b>There would be no entities</b> that are, simultaneously, instances and subclasses of ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${inputEntity}</u>)\nif ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${inputNewEntity}</u>).`
+            resultItem.innerHTML = `<b>There would be no entities</b> that are, simultaneously, instances and subclasses of ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u>)\nif ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${inputNewEntity}"><u>${inputNewEntity}</u>).`
 
             resultsDown.appendChild(resultItem);
         }
