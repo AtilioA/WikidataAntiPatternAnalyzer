@@ -3,7 +3,7 @@
   	<a href="https://atilioa.github.io/WikidataAntipatternAnalyzer/">
 		<img src=".github/wikidata_antipattern_analyzer_logo.png" width=50%">
 		<br/>
-	 	Wikidata Anti-pattern Analyzer
+	 	Wikidata Anti-Pattern Analyzer
     </a>
 </h1>
 
@@ -24,7 +24,7 @@ Static website to check for anti-patterns on Wikidata.
 
 This is a small static website I built during my undergraduate research (scientific initiation) in 2020-2021. It is capable of checking the existence of AP1 (AP2 coming soon) occurrences given an entity from Wikidata. It can also check if a new statement would introduce new violations. You can learn more about these specific anti-patterns in [this paper by Freddy Brasileiro](https://dl.acm.org/doi/abs/10.1145/2872518.2891117).
 
-Result example:
+Result example (outdated):
 <div align="center">
 <img src=".github/results.png" width="66%"/>
 </div>
