@@ -329,7 +329,7 @@ async function handleParams() {
             resultItem.setAttribute('class', "failure")
 
             const existentMultipleStringUp = createMultipleEntitiesLabelsString(antipatternsUp['existent'], allLabels)
-            resultItem.innerHTML = `${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${inputEntity}</u>) <b>is</b>, simultaneously, instance and subclass of `
+            resultItem.innerHTML = `${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u>) <b>is</b>, simultaneously, instance and subclass of `
             resultItem.innerHTML += existentMultipleStringUp;
 
             if (antipatternsUp['new'].length > MAX_ITEMS) {
@@ -351,7 +351,7 @@ async function handleParams() {
             resultItem.setAttribute('class', "failure")
 
             const newMultipleStringUp = createMultipleEntitiesLabelsString(antipatternsUp['new'], allLabels)
-            resultItem.innerHTML = `${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${entity}"><u>${inputEntity}</u>) <b>would be</b>, simultaneously, instance and subclass of ${newMultipleStringUp}\n if ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${inputNewEntity}"><u>${inputNewEntity}</u>)`;
+            resultItem.innerHTML = `${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u>) <b>would be</b>, simultaneously, instance and subclass of ${newMultipleStringUp}\n if ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${inputNewEntity}"><u>${inputNewEntity}</u>)`;
 
             resultsUp.appendChild(resultItem);
         } else if (params['analysis-option'] == 'new') {
