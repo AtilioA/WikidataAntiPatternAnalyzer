@@ -9,9 +9,16 @@
 }
 
 html {
-    position:relative;
+
+    position: relative;
     min-height: 100%;
 }
+
+.responsive {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+  }
 
 body {
     margin: 0;
@@ -28,7 +35,20 @@ body {
 }
 
 div#title {
-    font-size: 24px;
+    margin: 0px 10px 0px 10px;
+    text-align: center;
+}
+
+@media screen and (min-width: 751px) {
+    div#title {
+      	font-size: 24px;
+    }
+}
+
+@media screen and (max-width: 750px) {
+    div#title {
+		font-size: 16px;
+    }
 }
 
 div#title h1 {
@@ -42,12 +62,23 @@ h1 {
 }
 
 div#prompt {
-    font-size: 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     /* background-color: red; */
+}
+
+@media screen and (min-width: 751px) {
+    div#prompt {
+      	font-size: 20px;
+    }
+}
+
+@media screen and (max-width: 750px) {
+    div#prompt {
+		font-size: 12px;
+    }
 }
 
 div#radio-input {
@@ -196,7 +227,7 @@ div#disclaimer {
     margin: 20px;
     padding: 0px 10px 0px 10px;
     font-size: 14px;
-    line-height: 4px;
+    line-height: 15px;
     border-radius: 4px;
     text-align: center;
 }
