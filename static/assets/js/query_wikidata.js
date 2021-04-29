@@ -262,10 +262,10 @@ async function handleParams() {
     const inputNewEntity = params["inputNewEntity"].toUpperCase();
 
     // Show "Loading..." on page while results aren't ready
-    const results = document.querySelector("#prompt h2");
-    let resultsTitle = document.createElement('h2');
-    resultsTitle.innerHTML = "Loading...";
-    results.appendChild(resultsTitle);
+    const prompt = document.querySelector("#prompt h2");
+    let promptTitle = document.createElement('h2');
+    promptTitle.innerHTML = "Loading...";
+    prompt.appendChild(promptTitle);
 
     switch (params['analysis-option']) {
         case 'existent':
@@ -307,7 +307,7 @@ async function handleParams() {
     // Limit lists of entities to MAX_ITEMS
     antipatternsUp['existent'].splice(MAX_ITEMS)
     antipatternsDown['existent'].splice(MAX_ITEMS)
-    console.log(antipatternsUp)
+    // console.log(antipatternsUp)
     antipatternsUp['new'].splice(MAX_ITEMS)
     antipatternsDown['new'].splice(MAX_ITEMS)
 
@@ -317,9 +317,11 @@ async function handleParams() {
         ...antipatternsDown['existent'], ...antipatternsDown['new'],
         inputEntity, inputNewEntity
     ]
+
     allLabels = await getLabelsBulk(allEntities)
     console.log(allLabels)
 
+    prompt.removeChild(promptTitle);
 
     if (antipatternsUp) {
             const resultsUp = document.querySelector("#results-up");
@@ -329,7 +331,7 @@ async function handleParams() {
             resultItem.setAttribute('class', "failure")
 
             const existentMultipleStringUp = createMultipleEntitiesLabelsString(antipatternsUp['existent'], allLabels)
-            resultItem.innerHTML = `${allLabels[inputNewEntity]} (<u>${inputEntity}</u>) <b>is</b>, simultaneously, instance and subclass of `
+            resultItem.innerHTML = `${allLabels[inputEntity]} (<u>${inputEntity}</u>) <b>is</b>, simultaneously, instance and subclass of `
             resultItem.innerHTML += existentMultipleStringUp;
 
             if (antipatternsUp['new'].length > MAX_ITEMS) {
