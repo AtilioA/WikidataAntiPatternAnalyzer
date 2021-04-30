@@ -77,7 +77,7 @@ div#prompt {
 
 @media screen and (max-width: 750px) {
     div#prompt {
-		font-size: 12px;
+		font-size: 14px;
     }
 }
 
