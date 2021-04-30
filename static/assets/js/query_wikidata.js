@@ -146,6 +146,16 @@ async function checkForAntipatternUp(entity, statement) {
     return antipatternsUp;
 }
 
+function checkListOverlap(list1, list2) {
+    for (let element of list1) {
+        if (list2.includes(element)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 async function findNewAP1Down(entity, newEntity) {
     const AP1_QUERY_DOWN_NEW_P279 = `SELECT ?subject WHERE { ?subject wdt:P279+ wd:${entity} . ?subject wdt:P31 wd:${newEntity} . }`
 
@@ -351,7 +361,11 @@ async function handleParams() {
             resultItem.setAttribute('class', "failure")
 
             const newMultipleStringUp = createMultipleEntitiesLabelsString(antipatternsUp['new'], allLabels)
-            resultItem.innerHTML = `If ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${inputNewEntity}"><u>${inputNewEntity}</u></a>), then ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>) <b>would be</b>, simultaneously, instance and subclass of ${newMultipleStringUp}.`;
+            resultItem.innerHTML = `If ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${inputNewEntity}"><u>${inputNewEntity}</u></a>), then ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>) <b>would be</b>, simultaneously, instance and subclass of ${newMultipleStringUp}`;
+            if (checkListOverlap(antipatternsUp['existent'], antipatternsUp['new'])) {
+                resultItem.innerHTML += " through <i>new</i> transitive paths"
+            }
+            resultItem.innerHTML += '.';
 
             resultsUp.appendChild(resultItem);
         } else if (params['analysis-option'] == 'new') {
@@ -361,7 +375,7 @@ async function handleParams() {
             resultItem.setAttribute('class', "success")
 
             if (antipatternsUp['existent'].length == 0) {
-                resultItem.innerHTML = `If ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${inputNewEntity}"><u>${inputNewEntity}</u></a>), then ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>) <b>would still not be</b>, simultaneously, instance and subclass of another entity.`
+                resultItem.innerHTML = `Even if ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${inputNewEntity}"><u>${inputNewEntity}</u></a>), then ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>) <b>would still not be</b>, simultaneously, instance and subclass of another entity.`
             } else {
                 resultItem.innerHTML = `If ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${inputNewEntity}"><u>${inputNewEntity}</u></a>), then ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>) <b>would not be</b>, simultaneously, instance and subclass of another entity in a new way.`
             }
@@ -404,14 +418,15 @@ async function handleParams() {
 
             const newMultipleStringDown = await getStringListEntities(antipatternsDown['new'])
             if (antipatternsDownNewQuantity > MAX_ITEMS) {
+                resultItem.innerHTML = `If ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${inputNewEntity}"><u>${inputNewEntity}</u></a>), then ${newMultipleStringDown}, [...] (${antipatternsDownNewQuantity} entities) <b>would be</b>, simultaneously, instances and subclasses of ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</a></u>) through <i>new</i> transitive paths.`
             } else {
-                resultItem.innerHTML = `${newMultipleStringDown} <b>would be</b>, simultaneously, instance and subclass of <u>${inputEntity}</u>.`
+                resultItem.innerHTML = `If ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${inputNewEntity}"><u>${inputNewEntity}</u></a>), then ${newMultipleStringDown} <b>would be</b>, simultaneously, instance and subclass of ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</a></u>) through <i>new</i> transitive paths.`
             }
             resultsDown.appendChild(resultItem);
         } else if (params['analysis-option'] == 'new') {
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "success")
-            resultItem.innerHTML = `Even if ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${inputNewEntity}"><u>${inputNewEntity}</u></a>), then <b>there would still be no new entities</b> that are, simultaneously, instances and subclasses of ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>).`
+            resultItem.innerHTML = `If ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${inputNewEntity}"><u>${inputNewEntity}</u></a>), then <b>there would still be no new entities</b> that are, simultaneously, instances and subclasses of ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>).`
 
             resultsDown.appendChild(resultItem);
         }
