@@ -127,10 +127,9 @@ async function checkForAntipatternUp(entity, statement) {
     if (newProperty == "P31") { // "entity is instance of newEntity" is true
         queryResult = await isSubclass(entity, 'wd:' + newEntity);
         if (queryResult == "true") { // is "entity is subclass of newEntity" also true?
-            QIDsNew = newEntity; // then it is a violation
+            QIDsNew = [newEntity]; // then it is a violation
         }
     }
-    
     else if (newProperty == "P279") { // "entity P279 newEntity" is true
         const superclassesQuery = await queryP279(newEntity, '?object'); // get all newEntity's superclasses
         const superclasses = superclassesQuery['results']['bindings'].map(parseQueryResponseValue);
@@ -148,7 +147,7 @@ async function checkForAntipatternUp(entity, statement) {
 }
 
 async function findNewAP1Down(entity, newEntity) {
-    const AP1_QUERY_DOWN_NEW_P279 = `SELECT ?subject WHERE { ?subject wdt:P31 wd:${entity} . ?subject wdt:P279+ wd:${entity} . ?subject wdt:P31 wd:${newEntity} . }`
+    const AP1_QUERY_DOWN_NEW_P279 = `SELECT ?subject WHERE { ?subject wdt:P279+ wd:${entity} . ?subject wdt:P31 wd:${newEntity} . }`
 
     const response = await getRequestEndpoint(AP1_QUERY_DOWN_NEW_P279);
     const results = response['results']['bindings'];
@@ -333,7 +332,7 @@ async function handleParams() {
             resultItem.innerHTML = `Currently, ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>) <b>is</b>, simultaneously, instance and subclass of `
             resultItem.innerHTML += existentMultipleStringUp;
 
-            if (antipatternsUp['new'].length > MAX_ITEMS) {
+            if (antipatternsUpNewQuantity > MAX_ITEMS) {
                 resultItem.innerHTML += `, [...] (${antipatternsUpExistentQuantity} entities)`;
             }
             resultItem.innerHTML += '.';
@@ -404,8 +403,7 @@ async function handleParams() {
             resultItem.setAttribute('class', "failure")
 
             const newMultipleStringDown = await getStringListEntities(antipatternsDown['new'])
-            if (antipatternsDown['existent'].length > 1) {
-                resultItem.innerHTML = `${newMultipleStringDown} (${antipatternsDownNewQuantity} entities) <b>would be</b>, simultaneously, instances and subclasses of <u>${inputEntity}</u>.`
+            if (antipatternsDownNewQuantity > MAX_ITEMS) {
             } else {
                 resultItem.innerHTML = `${newMultipleStringDown} <b>would be</b>, simultaneously, instance and subclass of <u>${inputEntity}</u>.`
             }
