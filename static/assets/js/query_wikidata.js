@@ -202,17 +202,6 @@ function getUrlVars() {
     return vars;
 }
 
-async function getStringListEntities(entities) {
-    let string = "";
-    const labels = await getLabelsBulk(entities);
-    for ([index, entity] of entities.entries()) {
-        string += `${labels[entity]} (${entity})`
-        if (index + 1 != entities.length) { string += ', ' }
-    }
-
-    return string;
-}
-
 async function getLabelsBulk(entities) {
     let QUERY_LABEL_STRING = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nSELECT * WHERE { "
     let nEntities = 0;
@@ -416,7 +405,8 @@ async function handleParams() {
             let resultItem = document.createElement('p');
             resultItem.setAttribute('class', "failure")
 
-            const newMultipleStringDown = await getStringListEntities(antipatternsDown['new'])
+            const newMultipleStringDown = await createMultipleEntitiesLabelsString(antipatternsDown['new'], allLabels)
+
             if (antipatternsDownNewQuantity > MAX_ITEMS) {
                 resultItem.innerHTML = `If ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</u></a>) were ${getPropertyLabel(inputNewProperty)} ${allLabels[inputNewEntity]} (<a href="https://wikidata.org/wiki/${inputNewEntity}"><u>${inputNewEntity}</u></a>), then ${newMultipleStringDown}, [...] (${antipatternsDownNewQuantity} entities) <b>would be</b>, simultaneously, instances and subclasses of ${allLabels[inputEntity]} (<a href="https://wikidata.org/wiki/${inputEntity}"><u>${inputEntity}</a></u>) through <i>new</i> transitive paths.`
             } else {
