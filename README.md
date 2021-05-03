@@ -1,6 +1,6 @@
 
 <h1 align="center">
-  	<a href="https://atilioa.github.io/WikidataAntipatternAnalyzer/">
+  	<a href="https://atilioa.github.io/WikidataAntiPatternAnalyzer/">
 		<img src=".github/wikidata_antipattern_analyzer_logo.png" width=50%">
 		<br/>
 	 	Wikidata Anti-Pattern Analyzer
@@ -15,7 +15,7 @@ Static website to check for anti-patterns on Wikidata.
 
 <h5 align="center">
 
-[![GitHub branch checks state](https://img.shields.io/github/checks-status/AtilioA/WikidataAntipatternAnalyzer/gh-pages?label=gh-pages)](https://atilioa.github.io/WikidataAntipatternAnalyzer/)
+[![GitHub branch checks state](https://img.shields.io/github/checks-status/AtilioA/WikidataAntiPatternAnalyzer/gh-pages?label=gh-pages)](https://atilioa.github.io/WikidataAntiPatternAnalyzer/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 </h5>
