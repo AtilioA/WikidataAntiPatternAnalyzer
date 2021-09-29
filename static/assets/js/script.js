@@ -1,23 +1,29 @@
-$(document).ready(function() {
+$(document).ready(function () {
     var optionValue = undefined;
 
-    if ($('input[type="radio"]#new-antipattern').is(':checked')) {
+    if ($('input[type="radio"]#new-antipattern').is(":checked")) {
         optionValue = $('input[type="radio"]#new-antipattern').val();
-        $("#show-"+optionValue).show();
+        $("#show-" + optionValue).show();
     }
 
-    $('input[type="radio"]').click(function() {
+    $('input[type="radio"]').click(function () {
         // console.log(optionValue);
         if (optionValue) {
-            $("#show-"+optionValue).hide();
+            $("#show-" + optionValue).hide();
         }
         optionValue = $(this).val();
-        $("textInputDiv").hide();
-        $("#show-"+optionValue).show();
+        $("text-input-div").hide();
+        $("#show-" + optionValue).show();
     });
 
-    $('input[type="radio"]#new-antipattern').click(function() {
-        $('input[type="text"]#inputNewProperty')[0].setAttribute("required", true);
-        $('input[type="text"]#inputNewEntity')[0].setAttribute("required", true);
+    $('input[type="radio"]#new-antipattern').click(function () {
+        $('input[type="text"]#inputNewProperty')[0].setAttribute(
+            "required",
+            true
+        );
+        $('input[type="text"]#inputNewEntity')[0].setAttribute(
+            "required",
+            true
+        );
     });
 });

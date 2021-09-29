@@ -1,15 +1,14 @@
 @font-face {
-    font-family: 'Adamina';
-    src: url('../fonts/Adamina-Regular.ttf');
+    font-family: "Adamina";
+    src: url("../fonts/Adamina-Regular.ttf");
 }
 
 @font-face {
-    font-family: 'Red Hat Text';
-    src: url('../fonts/RedHatText-Regular.ttf');
+    font-family: "Red Hat Text";
+    src: url("../fonts/RedHatText-Regular.ttf");
 }
 
 html {
-
     position: relative;
     min-height: 100%;
 }
@@ -18,7 +17,8 @@ html {
     width: 100%;
     max-width: 100%;
     height: auto;
-  }
+    clip: rect(0px, 60px, 200px, 200px);
+}
 
 body {
     margin: 0;
@@ -27,7 +27,7 @@ body {
     font-size: 14px;
     line-height: 1.7;
     color: #1f1834;
-    background-color: #EAECF0;
+    background-color: #eaecf0;
     display: flex;
     flex-direction: column;
     /* justify-content: center; */
@@ -41,13 +41,13 @@ div#title {
 
 @media screen and (min-width: 751px) {
     div#title {
-      	font-size: 24px;
+        font-size: 24px;
     }
 }
 
 @media screen and (max-width: 750px) {
     div#title {
-		font-size: 16px;
+        font-size: 16px;
     }
 }
 
@@ -71,13 +71,13 @@ div#prompt {
 
 @media screen and (min-width: 751px) {
     div#prompt {
-      	font-size: 20px;
+        font-size: 20px;
     }
 }
 
 @media screen and (max-width: 750px) {
     div#prompt {
-		font-size: 14px;
+        font-size: 14px;
     }
 }
 
@@ -99,7 +99,7 @@ div#radio-input label {
     padding-right: 10px;
 }
 
-.textInputDivDefault {
+.text-input-div-default {
     display: block;
     padding-top: 10px;
 }
@@ -112,8 +112,8 @@ input {
 }
 
 /* Hidden form */
-.textInputDiv{
-	display: none;
+.text-input-div {
+    display: none;
     padding-bottom: 10px;
 }
 
@@ -132,11 +132,11 @@ button {
 
     border-radius: 8px;
     box-shadow: 0px 2px 5px 2px rgba(0, 0, 0, 0.1);
-    background-color: #4CCB8D;
+    background-color: #4ccb8d;
 }
 
 button#start-over {
-    background-color: #D94344;
+    background-color: #d94344;
 }
 
 div.results {
@@ -173,7 +173,7 @@ p.success {
 }
 
 p.failure {
-    color: #D94344;
+    color: #d94344;
 }
 
 p.success b {
@@ -187,7 +187,7 @@ p.success b {
 p.failure b {
     padding: 5px;
     /* margin: 0px 1px 0px 1px; */
-    background-color: #D94344;
+    background-color: #d94344;
     color: #fff;
     /* border-radius: 2px; */
 }
