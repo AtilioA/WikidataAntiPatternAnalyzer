@@ -22,7 +22,7 @@ Static website to check for anti-patterns on Wikidata.
 
 ## ℹ About
 
-This is a small static website I built during my undergraduate research (scientific initiation) in 2020-2021. It is capable of checking the existence of AP1 (AP2 coming soon) occurrences given an entity from Wikidata. It can also check if a new statement would introduce new violations. You can learn more about these specific anti-patterns in [this paper by Freddy Brasileiro](https://dl.acm.org/doi/abs/10.1145/2872518.2891117).
+This is a small static website I built during my undergraduate research (scientific initiation) in 2020-2021. It is capable of checking the existence of 'anti-pattern 1' (AP1) occurrences given an entity from Wikidata. It can also check if a new statement would introduce new violations. You can learn more about AP1 and other anti-patterns in [this paper by Freddy Brasileiro](https://dl.acm.org/doi/abs/10.1145/2872518.2891117).
 
 Result example (outdated):
 <div align="center">
